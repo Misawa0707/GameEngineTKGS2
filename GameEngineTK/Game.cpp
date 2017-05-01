@@ -64,6 +64,29 @@ void Game::Initialize(HWND window, int width, int height)
 
 	// デバッグカメラを生成
 	m_debugCamera = std::make_unique<DebugCamera>(m_outputWidth, m_outputHeight);
+
+	// エフェクトファクトリ生成
+	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
+	// テクスチャのパスを指定
+	m_factory->SetDirectory(L"Resources");
+	// モデルの生成
+	m_modelSkydome = Model::CreateFromCMO(
+		m_d3dDevice.Get(),
+		L"Resources/skydome.cmo",
+		*m_factory
+	);
+	// モデルの生成
+	m_modelGround = Model::CreateFromCMO(
+		m_d3dDevice.Get(),
+		L"Resources/ground1m.cmo",
+		*m_factory
+	);
+	// モデルの生成
+	m_modelBall = Model::CreateFromCMO(
+		m_d3dDevice.Get(),
+		L"Resources/ball.cmo",
+		*m_factory
+	);
 }
 
 // Executes the basic game loop.
@@ -86,6 +109,23 @@ void Game::Update(DX::StepTimer const& timer)
     elapsedTime;
 	// 毎フレーム処理を書く
 	m_debugCamera->Update();
+
+	// ワールド行列を計算
+	// スケーリング
+	Matrix scalemat = Matrix::CreateScale(0.1f);
+	// ロール
+	Matrix rotmatz = Matrix::CreateRotationZ(XMConvertToRadians(15.0f));
+	// ピッチ（仰角）
+	Matrix rotmatx = Matrix::CreateRotationX(XM_PIDIV4);
+	// ヨー（方位角）
+	Matrix rotmaty = Matrix::CreateRotationY(XM_PIDIV4);
+	// 回転行列の合成
+	Matrix rotmat = rotmatz * rotmatx * rotmaty;
+
+	// 平行移動
+	Matrix transmat = Matrix::CreateTranslation(0, 10, 0);
+	// ワールド行列の合成(SRT)
+	m_worldBall = scalemat * rotmat * transmat;
 }
 
 // Draws the scene.
@@ -132,13 +172,35 @@ void Game::Render()
 		XM_PI / 4.f,	// 視野角（上下方向）
 		float(m_outputWidth) / float(m_outputHeight),	// アスペクト比
 		0.1f, // ニアクリップ
-		50.f);	// ファークリップ
+		500.f);	// ファークリップ
 
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
 
 	m_effect->Apply(m_d3dContext.Get());
 	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
+
+	// モデルの描画
+	m_modelSkydome->Draw(m_d3dContext.Get(),
+		*m_states,
+		m_world,
+		m_view,
+		m_proj
+	);
+	// モデルの描画
+	m_modelGround->Draw(m_d3dContext.Get(),
+		*m_states,
+		m_world,
+		m_view,
+		m_proj
+	);
+	// モデルの描画
+	m_modelBall->Draw(m_d3dContext.Get(),
+		*m_states,
+		m_worldBall,
+		m_view,
+		m_proj
+	);
 
 	m_batch->Begin();
 
