@@ -78,7 +78,7 @@ void Game::Initialize(HWND window, int width, int height)
 	// モデルの生成
 	m_modelGround = Model::CreateFromCMO(
 		m_d3dDevice.Get(),
-		L"Resources/ground1m.cmo",
+		L"Resources/ground200m.cmo",
 		*m_factory
 	);
 	// モデルの生成
@@ -87,6 +87,19 @@ void Game::Initialize(HWND window, int width, int height)
 		L"Resources/ball.cmo",
 		*m_factory
 	);
+	// モデルの生成
+	m_modelHead = Model::CreateFromCMO(
+		m_d3dDevice.Get(),
+		L"Resources/head.cmo",
+		*m_factory
+	);
+
+	m_AngleBall = 0.0f;
+
+	// キーボードの生成
+	keyboard = std::make_unique<Keyboard>();
+
+	head_angle = 0.0f;
 }
 
 // Executes the basic game loop.
@@ -110,22 +123,94 @@ void Game::Update(DX::StepTimer const& timer)
 	// 毎フレーム処理を書く
 	m_debugCamera->Update();
 
-	// ワールド行列を計算
-	// スケーリング
-	Matrix scalemat = Matrix::CreateScale(0.1f);
-	// ロール
-	Matrix rotmatz = Matrix::CreateRotationZ(XMConvertToRadians(15.0f));
-	// ピッチ（仰角）
-	Matrix rotmatx = Matrix::CreateRotationX(XM_PIDIV4);
-	// ヨー（方位角）
-	Matrix rotmaty = Matrix::CreateRotationY(XM_PIDIV4);
-	// 回転行列の合成
-	Matrix rotmat = rotmatz * rotmatx * rotmaty;
+	m_AngleBall += 1.0f;
 
-	// 平行移動
-	Matrix transmat = Matrix::CreateTranslation(0, 10, 0);
-	// ワールド行列の合成(SRT)
-	m_worldBall = scalemat * rotmat * transmat;
+	// ワールド行列を計算
+	for (int i = 0; i < 10; i++)
+	{
+		// スケーリング
+		Matrix scalemat = Matrix::CreateScale(1.0f);
+		// ロール
+		Matrix rotmatz = Matrix::CreateRotationZ(XMConvertToRadians(0));
+		// ピッチ（仰角）
+		Matrix rotmatx = Matrix::CreateRotationX(XMConvertToRadians(0));
+		// ヨー（方位角）
+		Matrix rotmaty = Matrix::CreateRotationY(XMConvertToRadians(360.0f/10*i+ m_AngleBall));
+		// 回転行列の合成
+		Matrix rotmat = rotmatz * rotmatx * rotmaty;
+
+		// 平行移動
+		Matrix transmat = Matrix::CreateTranslation(20, 0, 0);
+		// ワールド行列の合成(SRT)
+		m_worldBall[i] = transmat * rotmat;
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		// スケーリング
+		Matrix scalemat = Matrix::CreateScale(1.0f);
+		// ロール
+		Matrix rotmatz = Matrix::CreateRotationZ(XMConvertToRadians(0));
+		// ピッチ（仰角）
+		Matrix rotmatx = Matrix::CreateRotationX(XMConvertToRadians(0));
+		// ヨー（方位角）
+		Matrix rotmaty = Matrix::CreateRotationY(XMConvertToRadians(360.0f / 10 * i - m_AngleBall));
+		// 回転行列の合成
+		Matrix rotmat = rotmatz * rotmatx * rotmaty;
+
+		// 平行移動
+		Matrix transmat = Matrix::CreateTranslation(40, 0, 0);
+		// ワールド行列の合成(SRT)
+		m_worldBall[i+10] = rotmat * transmat;
+	}
+	// キーボードの状態取得
+	Keyboard::State g_key = keyboard->GetState();
+
+	// 左旋回処理
+	if (g_key.A)
+	{
+		// 自機の角度を回転
+		head_angle += 0.03f;
+	}
+
+	// 右旋回処理
+	if (g_key.D)
+	{
+		// 自機の角度を回転
+		head_angle += -0.03f;
+	}
+
+	// 前進処理
+	if (g_key.W)
+	{
+		// 移動量のベクトル
+		Vector3 moveV(0, 0, -0.1f);
+		// 移動ベクトルを自機の角度分回転させる
+		//moveV = Vector3::TransformNormal(moveV, head_world);
+		Matrix rotmat = Matrix::CreateRotationY(head_angle);
+		moveV = Vector3::TransformNormal(moveV, rotmat);
+		// 自機の座標を移動
+		head_pos += moveV;
+	}
+
+	// 後退処理
+	if (g_key.S)
+	{
+		// 移動量のベクトル
+		Vector3 moveV(0, 0, +0.1f);
+		// 移動ベクトルを自機の角度分回転させる
+		Matrix rotmat = Matrix::CreateRotationY(head_angle);
+		moveV = Vector3::TransformNormal(moveV, rotmat);
+		// 自機の座標を移動
+		head_pos += moveV;
+	}
+
+	{// 自機のワールド行列を計算
+		Matrix rotmat = Matrix::CreateRotationY(head_angle);
+		Matrix transmat = Matrix::CreateTranslation(head_pos);
+		// ワールド行列の合成
+		head_world = rotmat * transmat;
+	}
 }
 
 // Draws the scene.
@@ -183,21 +268,32 @@ void Game::Render()
 	// モデルの描画
 	m_modelSkydome->Draw(m_d3dContext.Get(),
 		*m_states,
-		m_world,
+		Matrix::Identity,
 		m_view,
 		m_proj
 	);
 	// モデルの描画
 	m_modelGround->Draw(m_d3dContext.Get(),
 		*m_states,
-		m_world,
+		Matrix::Identity,
 		m_view,
 		m_proj
 	);
 	// モデルの描画
-	m_modelBall->Draw(m_d3dContext.Get(),
+	for (int i = 0; i < 20; i++)
+	{
+		m_modelBall->Draw(m_d3dContext.Get(),
+			*m_states,
+			m_worldBall[i],
+			m_view,
+			m_proj
+		);
+	}
+
+	// モデルの描画
+	m_modelHead->Draw(m_d3dContext.Get(),
 		*m_states,
-		m_worldBall,
+		head_world,
 		m_view,
 		m_proj
 	);
