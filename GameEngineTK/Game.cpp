@@ -100,6 +100,11 @@ void Game::Initialize(HWND window, int width, int height)
 	keyboard = std::make_unique<Keyboard>();
 
 	head_angle = 0.0f;
+
+	// カメラの生成
+	m_Camera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
+
+	//head_pos = Vector3(0, 0, 30);
 }
 
 // Executes the basic game loop.
@@ -211,6 +216,15 @@ void Game::Update(DX::StepTimer const& timer)
 		// ワールド行列の合成
 		head_world = rotmat * transmat;
 	}
+
+	{// 自機に追従するカメラ
+		m_Camera->SetTargetPos(head_pos);
+		m_Camera->SetTargetAngle(head_angle);
+
+		m_Camera->Update();
+		m_view = m_Camera->GetView();
+		m_proj = m_Camera->GetProj();
+	}
 }
 
 // Draws the scene.
@@ -251,13 +265,30 @@ void Game::Render()
 	//	Vector3(0,1,0)	// 画面上方向ベクトル
 	//);
 	// デバッグカメラからビュー行列を取得
-	m_view = m_debugCamera->GetCameraMatrix();
+	//m_view = m_debugCamera->GetCameraMatrix();
+
+	//// カメラの位置（視点座標）
+	//Vector3 eyepos(0, 0, 5);
+	//// カメラの見ている先(注視点/参照点)
+	//Vector3 refpos(0, 0, 0);
+	//// カメラの上方向ベクトル
+	//static float angle = 0.0f;
+	//angle += 0.1f;
+	//Vector3 upvec(cosf(angle), sinf(angle), 0);
+	//upvec.Normalize();
+	//// ビュー行列の生成
+	//m_view = Matrix::CreateLookAt(eyepos, refpos, upvec);
 	// プロジェクション行列を生成
-	m_proj = Matrix::CreatePerspectiveFieldOfView(
-		XM_PI / 4.f,	// 視野角（上下方向）
-		float(m_outputWidth) / float(m_outputHeight),	// アスペクト比
-		0.1f, // ニアクリップ
-		500.f);	// ファークリップ
+	//// 垂直方向視野角
+	//float fovY = XMConvertToRadians(60.0f);
+	//// アスペクト比（横縦の比率）
+	//float aspect = (float)m_outputWidth / m_outputHeight;
+	//// ニアクリップ（手前の表示限界距離）
+	//float nearclip = 0.1f;
+	//// ファークリップ（奥の表示限界距離）
+	//float farclip = 1000.0f;
+	//// 射影行列の生成
+	//m_proj = Matrix::CreatePerspectiveFieldOfView(fovY,	aspect,	nearclip,farclip);
 
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
