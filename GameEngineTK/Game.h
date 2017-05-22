@@ -14,6 +14,7 @@
 #include <Keyboard.h>
 #include "DebugCamera.h"
 #include "FollowCamera.h"
+#include "Obj3d.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -98,8 +99,8 @@ private:
 	std::unique_ptr<DirectX::Model> m_modelGround;
 	// 球モデル
 	std::unique_ptr<DirectX::Model> m_modelBall;
-	// 頭部モデル
-	std::unique_ptr<DirectX::Model> m_modelHead;
+	//// 頭部モデル
+	//std::unique_ptr<DirectX::Model> m_modelHead;
 	// 球のワールド行列
 	DirectX::SimpleMath::Matrix m_worldBall[20];
 	// 球の角度
@@ -110,8 +111,16 @@ private:
 	DirectX::SimpleMath::Vector3 head_pos;
 	// 自機の回転角
 	float head_angle;
-	// 自機のワールド行列
-	DirectX::SimpleMath::Matrix head_world;
+	//// 自機のワールド行列1
+	//DirectX::SimpleMath::Matrix head_world;
+	//// 自機のワールド行列2
+	//DirectX::SimpleMath::Matrix head_world2;
+	// 自機パーツ１（親パーツ） 
+	Obj3d m_ObjPlayer1;
+	// 自機パーツ２（子パーツ） 
+	Obj3d m_ObjPlayer2;
+	//std::vector<Obj3d> m_ObjPlayer;
+
 	// カメラ
 	std::unique_ptr<FollowCamera> m_Camera;
 };

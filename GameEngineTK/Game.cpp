@@ -38,7 +38,15 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
 	// 初期化はここに書く
-	
+	// キーボードの生成
+	keyboard = std::make_unique<Keyboard>();
+	// カメラの生成
+	m_Camera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
+	// カメラにキーボードをセット
+	m_Camera->SetKeyboard(keyboard.get());
+	// ３Ｄオブジェクトの静的メンバ変数を初期化
+	Obj3d::InitializeStatic(m_d3dDevice, m_d3dContext, m_Camera.get());
+
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
 
 
@@ -87,24 +95,19 @@ void Game::Initialize(HWND window, int width, int height)
 		L"Resources/ball.cmo",
 		*m_factory
 	);
-	// モデルの生成
-	m_modelHead = Model::CreateFromCMO(
-		m_d3dDevice.Get(),
-		L"Resources/head.cmo",
-		*m_factory
-	);
+	//// モデルの生成
+	//m_modelHead = Model::CreateFromCMO(
+	//	m_d3dDevice.Get(),
+	//	L"Resources/head.cmo",
+	//	*m_factory
+	//);
 
 	m_AngleBall = 0.0f;
 
-	// キーボードの生成
-	keyboard = std::make_unique<Keyboard>();
+	
 
 	head_angle = 0.0f;
 
-	// カメラの生成
-	m_Camera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
-	// カメラにキーボードをセット
-	m_Camera->SetKeyboard(keyboard.get());
 	//head_pos = Vector3(0, 0, 30);
 }
 
@@ -211,12 +214,21 @@ void Game::Update(DX::StepTimer const& timer)
 		head_pos += moveV;
 	}
 
-	{// 自機のワールド行列を計算
-		Matrix rotmat = Matrix::CreateRotationY(head_angle);
-		Matrix transmat = Matrix::CreateTranslation(head_pos);
-		// ワールド行列の合成
-		head_world = rotmat * transmat;
-	}
+	//{// 自機のワールド行列を計算
+	//	// パーツ１の計算
+	//	Matrix rotmat = Matrix::CreateRotationY(head_angle);
+	//	Matrix transmat = Matrix::CreateTranslation(head_pos);
+	//	// ワールド行列の合成
+	//	head_world = rotmat * transmat;
+
+	//	// パーツ２の計算
+	//	Matrix rotmat2 = Matrix::CreateRotationZ(XM_PIDIV2) * Matrix::CreateRotationY(0);
+	//	Matrix transmat2 = Matrix::CreateTranslation(Vector3(0,0.5f,0));
+	//	// ワールド行列の合成（子供の行列*親の行列))
+	//	head_world2 = rotmat2 * transmat2 * head_world;
+
+	//	//head_world3 = rotmat3 * transmat3 * head_world2;
+	//}
 
 	{// 自機に追従するカメラ
 		m_Camera->SetTargetPos(head_pos);
@@ -322,13 +334,20 @@ void Game::Render()
 		);
 	}
 
-	// モデルの描画
-	m_modelHead->Draw(m_d3dContext.Get(),
-		*m_states,
-		head_world,
-		m_view,
-		m_proj
-	);
+	//// パーツ1の描画
+	//m_modelHead->Draw(m_d3dContext.Get(),
+	//	*m_states,
+	//	head_world,
+	//	m_view,
+	//	m_proj
+	//);
+	//// パーツ2の描画
+	//m_modelHead->Draw(m_d3dContext.Get(),
+	//	*m_states,
+	//	head_world2,
+	//	m_view,
+	//	m_proj
+	//);
 
 	m_batch->Begin();
 
