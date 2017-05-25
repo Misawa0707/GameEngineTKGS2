@@ -1,10 +1,10 @@
 /*							Parts Assembler
                                   Version 2.04.080624(:
 Parts: 
-	F2\F214.suf
+	W2\W205.suf
 Info:
 	DisplayOffset: (   0.000   0.000   0.000 )
-	DisplayScale: 0.250000000000
+	DisplayScale: 0.125000000000
 	MeshFlag: 1
 	MeshSpacing: 200
 	ShowStatus: 1
@@ -15,10 +15,10 @@ Info:
 */
 fram
 {
-	light pal( rgb ( 1.00 1.00 1.00 ) -10  70 -70 )
-	{	mov ( 1200 -900 900 ) eye deg( 60 ) }
+	light pal( rgb ( 1.00 1.00 1.00 )  28  64 -70 )
+	{	mov ( 188.914 -476.411 1672.53 ) eye deg( 60 ) }
 	{	mov ( 0 0 0 ) target }
-{	mov ( 100 0 150 ) rotz ( 180 ) roty ( 0 ) rotx ( 0 )
-	scal ( 1 1 1 ) obj F214 /* "F2\F214.suf" */
+{	mov ( -100 0 0 ) rotz ( 180 ) roty ( 0 ) rotx ( 0 )
+	scal ( 1 1 1 ) obj W205 /* "W2\W205.suf" */
 }
 }

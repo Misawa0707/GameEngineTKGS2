@@ -22,6 +22,18 @@ class Game
 {
 public:
 
+	// 自機パーツ
+	enum PLAYER_PARTS
+	{
+		PLAYER_PARTS_UFO,		// UFO
+		PLAYER_PARTS_HEAD,		// 頭
+		PLAYER_PARTS_LWING,		// 左翼
+		PLAYER_PARTS_RWING,		// 右翼
+		PLAYER_PARTS_VERNIER,	// 推進機
+
+		PLAYER_PARTS_NUM
+	};
+
     Game();
 
     // Initialization and management
@@ -94,7 +106,7 @@ private:
 	// エフェクトファクトリ
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
 	// 天球モデル
-	std::unique_ptr<DirectX::Model> m_modelSkydome;
+	Obj3d m_objSkydome;
 	// 地面モデル
 	std::unique_ptr<DirectX::Model> m_modelGround;
 	// 球モデル
@@ -115,11 +127,8 @@ private:
 	//DirectX::SimpleMath::Matrix head_world;
 	//// 自機のワールド行列2
 	//DirectX::SimpleMath::Matrix head_world2;
-	// 自機パーツ１（親パーツ） 
-	Obj3d m_ObjPlayer1;
-	// 自機パーツ２（子パーツ） 
-	Obj3d m_ObjPlayer2;
-	//std::vector<Obj3d> m_ObjPlayer;
+	// 自機パーツ
+	std::vector<Obj3d> m_ObjPlayer;
 
 	// カメラ
 	std::unique_ptr<FollowCamera> m_Camera;

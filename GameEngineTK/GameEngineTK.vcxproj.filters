@@ -53,5 +53,17 @@
     <MeshContentTask Include="Assets\head.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
+    <MeshContentTask Include="Assets\lwing.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\rwing.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\ufo.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\vernier.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
   </ItemGroup>
 </Project>

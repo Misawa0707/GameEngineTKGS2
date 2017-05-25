@@ -45,38 +45,37 @@ public:
 	// 描画
 	void Draw();
 
-	// メンバ関数
 	// setter
 	// スケーリング(XYZ)
-
+	void SetScale(const DirectX::SimpleMath::Vector3& scale) { m_scale = scale; }
 	// 回転角(XYZ)
-
+	void SetRotation(const DirectX::SimpleMath::Vector3& rotation) { m_rotation = rotation; }
 	// 平行移動(XYZ)
-
+	void SetTranslation(const DirectX::SimpleMath::Vector3& translation) { m_translation = translation; }
 	// 親の３Ｄオブジェクト
-
+	void SetObjParent(Obj3d* ObjParent) { m_ObjParent = ObjParent; }
 	// getter
 	// スケーリング(XYZ)
-
+	const DirectX::SimpleMath::Vector3& GetScale() { return m_scale; }
 	// 回転角(XYZ)
-
+	const DirectX::SimpleMath::Vector3& GetRotation() { return m_rotation; }
 	// 平行移動(XYZ)
-
+	const DirectX::SimpleMath::Vector3& GetTranslation() { return m_translation; }
 	// ワールド行列
-
+	const DirectX::SimpleMath::Matrix& GetWorld() { return m_world; }
 
 private:
 	// メンバ変数
 	// モデル
-
+	std::unique_ptr<DirectX::Model> m_model;
 	// スケーリング(XYZ)
-
+	DirectX::SimpleMath::Vector3 m_scale;
 	// 回転角(XYZ)
-
+	DirectX::SimpleMath::Vector3 m_rotation;
 	// 平行移動(XYZ)
-
+	DirectX::SimpleMath::Vector3 m_translation;
 	// ワールド行列
-
+	DirectX::SimpleMath::Matrix m_world;
 	// 親のObj3dへのポインタ
 	Obj3d* m_ObjParent;
 };
