@@ -29,7 +29,8 @@ public:
 		PLAYER_PARTS_HEAD,		// 頭
 		PLAYER_PARTS_LWING,		// 左翼
 		PLAYER_PARTS_RWING,		// 右翼
-		PLAYER_PARTS_VERNIER,	// 推進機
+		PLAYER_PARTS_LVERNIER,	// 推進機
+		PLAYER_PARTS_RVERNIER,	// 推進機
 
 		PLAYER_PARTS_NUM
 	};
@@ -129,6 +130,8 @@ private:
 	//DirectX::SimpleMath::Matrix head_world2;
 	// 自機パーツ
 	std::vector<Obj3d> m_ObjPlayer;
+	// サイン用の角度
+	float m_cycle;
 
 	// カメラ
 	std::unique_ptr<FollowCamera> m_Camera;

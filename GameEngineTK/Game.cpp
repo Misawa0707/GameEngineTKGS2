@@ -107,12 +107,36 @@ void Game::Initialize(HWND window, int width, int height)
 
 	//head_pos = Vector3(0, 0, 30);
 
+	// 自機パーツの読み込み
 	m_ObjPlayer.resize(PLAYER_PARTS_NUM);
 	m_ObjPlayer[PLAYER_PARTS_UFO].LoadModel(L"Resources/ufo.cmo");
 	m_ObjPlayer[PLAYER_PARTS_HEAD].LoadModel(L"Resources/head.cmo");
 	m_ObjPlayer[PLAYER_PARTS_LWING].LoadModel(L"Resources/lwing.cmo");
 	m_ObjPlayer[PLAYER_PARTS_RWING].LoadModel(L"Resources/rwing.cmo");
-	m_ObjPlayer[PLAYER_PARTS_VERNIER].LoadModel(L"Resources/vernier.cmo");
+	m_ObjPlayer[PLAYER_PARTS_LVERNIER].LoadModel(L"Resources/vernier.cmo");
+	m_ObjPlayer[PLAYER_PARTS_RVERNIER].LoadModel(L"Resources/vernier.cmo");
+	
+	// 親子関係の構築（子パーツに親を設定）
+	m_ObjPlayer[PLAYER_PARTS_HEAD].SetObjParent(&m_ObjPlayer[PLAYER_PARTS_UFO]);
+	m_ObjPlayer[PLAYER_PARTS_LWING].SetObjParent(&m_ObjPlayer[PLAYER_PARTS_HEAD]);
+	m_ObjPlayer[PLAYER_PARTS_RWING].SetObjParent(&m_ObjPlayer[PLAYER_PARTS_HEAD]);
+	m_ObjPlayer[PLAYER_PARTS_LVERNIER].SetObjParent(&m_ObjPlayer[PLAYER_PARTS_UFO]);
+	m_ObjPlayer[PLAYER_PARTS_RVERNIER].SetObjParent(&m_ObjPlayer[PLAYER_PARTS_UFO]);
+
+	// 子パーツの親からのオフセット（座標のずれ）をセット
+	m_ObjPlayer[PLAYER_PARTS_HEAD].SetTranslation(Vector3(0, 0.3f, 0));
+	m_ObjPlayer[PLAYER_PARTS_LWING].SetTranslation(Vector3(-0.2f, 0.2f, 0));
+	m_ObjPlayer[PLAYER_PARTS_RWING].SetTranslation(Vector3(+0.2f, 0.2f, 0));
+	m_ObjPlayer[PLAYER_PARTS_LVERNIER].SetTranslation(Vector3(-0.2f, 0.1f, 0.6f));
+	m_ObjPlayer[PLAYER_PARTS_RVERNIER].SetTranslation(Vector3(+0.2f, 0.1f, 0.6f));
+
+	m_ObjPlayer[PLAYER_PARTS_HEAD].SetScale(Vector3(2,2,2));
+	m_ObjPlayer[PLAYER_PARTS_LWING].SetScale(Vector3(0.5f, 0.5f, 0.5f));
+
+	m_ObjPlayer[PLAYER_PARTS_LWING].SetRotation(Vector3(0, 0, XMConvertToRadians(-30)));
+	m_ObjPlayer[PLAYER_PARTS_RWING].SetRotation(Vector3(0, 0, XMConvertToRadians(+30)));
+
+	m_cycle = 0;
 }
 
 // Executes the basic game loop.
@@ -176,6 +200,15 @@ void Game::Update(DX::StepTimer const& timer)
 		// ワールド行列の合成(SRT)
 		m_worldBall[i+10] = rotmat * transmat;
 	}
+
+	// パーツギミック
+	{
+		m_cycle += 0.1f;
+		float pos_z = -1.0f + sinf(m_cycle);
+		m_ObjPlayer[PLAYER_PARTS_LWING].SetRotation(
+			Vector3(-0.2f, 0.2f, 0) + Vector3(0, 0, pos_z));
+	}
+
 	// キーボードの状態取得
 	Keyboard::State g_key = keyboard->GetState();
 
@@ -183,14 +216,18 @@ void Game::Update(DX::StepTimer const& timer)
 	if (g_key.A)
 	{
 		// 自機の角度を回転
-		head_angle += 0.03f;
+		//head_angle += 0.03f;
+		float angle = m_ObjPlayer[0].GetRotation().y;
+		m_ObjPlayer[0].SetRotation(Vector3(0, angle + 0.03f,0));
 	}
 
 	// 右旋回処理
 	if (g_key.D)
 	{
 		// 自機の角度を回転
-		head_angle += -0.03f;
+		//head_angle += -0.03f;
+		float angle = m_ObjPlayer[0].GetRotation().y;
+		m_ObjPlayer[0].SetRotation(Vector3(0, angle - 0.03f, 0));
 	}
 
 	// 前進処理
@@ -200,10 +237,12 @@ void Game::Update(DX::StepTimer const& timer)
 		Vector3 moveV(0, 0, -0.1f);
 		// 移動ベクトルを自機の角度分回転させる
 		//moveV = Vector3::TransformNormal(moveV, head_world);
-		Matrix rotmat = Matrix::CreateRotationY(head_angle);
+		float angle = m_ObjPlayer[0].GetRotation().y;
+		Matrix rotmat = Matrix::CreateRotationY(angle);
 		moveV = Vector3::TransformNormal(moveV, rotmat);
 		// 自機の座標を移動
-		head_pos += moveV;
+		Vector3 pos = m_ObjPlayer[0].GetTranslation();
+		m_ObjPlayer[0].SetTranslation(pos + moveV);
 	}
 
 	// 後退処理
@@ -212,10 +251,13 @@ void Game::Update(DX::StepTimer const& timer)
 		// 移動量のベクトル
 		Vector3 moveV(0, 0, +0.1f);
 		// 移動ベクトルを自機の角度分回転させる
-		Matrix rotmat = Matrix::CreateRotationY(head_angle);
+		//moveV = Vector3::TransformNormal(moveV, head_world);
+		float angle = m_ObjPlayer[0].GetRotation().y;
+		Matrix rotmat = Matrix::CreateRotationY(angle);
 		moveV = Vector3::TransformNormal(moveV, rotmat);
 		// 自機の座標を移動
-		head_pos += moveV;
+		Vector3 pos = m_ObjPlayer[0].GetTranslation();
+		m_ObjPlayer[0].SetTranslation(pos + moveV);
 	}
 
 	//{// 自機のワールド行列を計算
