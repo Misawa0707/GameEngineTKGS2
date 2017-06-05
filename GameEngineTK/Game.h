@@ -22,18 +22,7 @@ class Game
 {
 public:
 
-	// 自機パーツ
-	enum PLAYER_PARTS
-	{
-		PLAYER_PARTS_UFO,		// UFO
-		PLAYER_PARTS_HEAD,		// 頭
-		PLAYER_PARTS_LWING,		// 左翼
-		PLAYER_PARTS_RWING,		// 右翼
-		PLAYER_PARTS_LVERNIER,	// 推進機
-		PLAYER_PARTS_RVERNIER,	// 推進機
-
-		PLAYER_PARTS_NUM
-	};
+	
 
     Game();
 
@@ -120,18 +109,8 @@ private:
 	float m_AngleBall;
 	// キーボード
 	std::unique_ptr<DirectX::Keyboard> keyboard;
-	// 自機の座標
-	DirectX::SimpleMath::Vector3 head_pos;
-	// 自機の回転角
-	float head_angle;
-	//// 自機のワールド行列1
-	//DirectX::SimpleMath::Matrix head_world;
-	//// 自機のワールド行列2
-	//DirectX::SimpleMath::Matrix head_world2;
-	// 自機パーツ
-	std::vector<Obj3d> m_ObjPlayer;
-	// サイン用の角度
-	float m_cycle;
+
+	
 
 	// カメラ
 	std::unique_ptr<FollowCamera> m_Camera;
