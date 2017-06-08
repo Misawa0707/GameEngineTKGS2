@@ -13,6 +13,7 @@ FollowCamera::FollowCamera(int width, int height)
 	m_targetAngle = 0.0f;
 	m_keyboard = nullptr;
 	isFPS = false;
+	m_player = nullptr;
 }
 
 void FollowCamera::Update()
@@ -26,6 +27,13 @@ void FollowCamera::Update()
 	{
 		// カメラのフラグを切り替え
 		isFPS = !isFPS;
+	}
+	
+	// 追従対象の座標等をセット
+	if (m_player)
+	{
+		SetTargetPos(m_player->GetTrans());
+		SetTargetAngle(m_player->GetRot().y);
 	}
 
 	// カメラ視点座標、参照点座標

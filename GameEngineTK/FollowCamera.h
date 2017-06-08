@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <Keyboard.h>
 #include "Camera.h"
+#include "Player.h"
 
 class FollowCamera : public Camera
 {
@@ -23,6 +24,8 @@ public:
 	void SetTargetAngle(float targetangle);
 	// キーボードをセット
 	void SetKeyboard(DirectX::Keyboard* keyboard);
+	// プレイヤーをセット
+	void SetPlayer(Player* player) { m_player = player; }
 protected:
 	// 追従対象の座標
 	DirectX::SimpleMath::Vector3 m_targetPos;
@@ -34,4 +37,6 @@ protected:
 	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
 	// FPSフラグ
 	bool isFPS;
+	// プレイヤー
+	Player* m_player;
 };

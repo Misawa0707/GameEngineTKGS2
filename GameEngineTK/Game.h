@@ -15,6 +15,8 @@
 #include "DebugCamera.h"
 #include "FollowCamera.h"
 #include "Obj3d.h"
+#include "Player.h"
+#include "Enemy.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -98,20 +100,13 @@ private:
 	// 天球モデル
 	Obj3d m_objSkydome;
 	// 地面モデル
-	std::unique_ptr<DirectX::Model> m_modelGround;
-	// 球モデル
-	std::unique_ptr<DirectX::Model> m_modelBall;
-	//// 頭部モデル
-	//std::unique_ptr<DirectX::Model> m_modelHead;
-	// 球のワールド行列
-	DirectX::SimpleMath::Matrix m_worldBall[20];
-	// 球の角度
-	float m_AngleBall;
+	std::unique_ptr<DirectX::Model> m_modelGround;	
 	// キーボード
 	std::unique_ptr<DirectX::Keyboard> keyboard;
-
-	
-
 	// カメラ
 	std::unique_ptr<FollowCamera> m_Camera;
+	// プレイヤー
+	std::unique_ptr<Player> m_Player;
+	// 敵
+	std::vector<std::unique_ptr<Enemy>> m_Enemies;
 };

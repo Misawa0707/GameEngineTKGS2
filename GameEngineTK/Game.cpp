@@ -86,22 +86,22 @@ void Game::Initialize(HWND window, int width, int height)
 		L"Resources/ground200m.cmo",
 		*m_factory
 	);
-	// モデルの生成
-	m_modelBall = Model::CreateFromCMO(
-		m_d3dDevice.Get(),
-		L"Resources/ball.cmo",
-		*m_factory
-	);
-	//// モデルの生成
-	//m_modelHead = Model::CreateFromCMO(
-	//	m_d3dDevice.Get(),
-	//	L"Resources/head.cmo",
-	//	*m_factory
-	//);
-
-	m_AngleBall = 0.0f;
-
 	
+	// プレイヤーの生成
+	m_Player = std::make_unique<Player>(keyboard.get());
+	m_Player->Initialize();
+	
+	// 追従カメラにプレイヤーをセット
+	m_Camera->SetPlayer(m_Player.get());
+
+	// 敵の生成
+	int enemyNum = rand() % 10 + 1;
+	m_Enemies.resize(enemyNum);
+	for (int i = 0; i < enemyNum; i++)
+	{
+		m_Enemies[i] = std::make_unique<Enemy>(keyboard.get());
+		m_Enemies[i]->Initialize();
+	}
 }
 
 // Executes the basic game loop.
@@ -130,9 +130,20 @@ void Game::Update(DX::StepTimer const& timer)
 	// キーボードの状態取得
 	Keyboard::State g_key = keyboard->GetState();
 
+	m_Player->Update();
+
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
+		it != m_Enemies.end();
+		it++)
+	{
+		//Enemy* enemy = it->get();
+
+		//enemy->Update();
+		(*it)->Update();
+	}
+
 	{// 自機に追従するカメラ
-		//m_Camera->SetTargetPos(head_pos);
-		//m_Camera->SetTargetAngle(head_angle);
+		
 
 		m_Camera->Update();
 		m_view = m_Camera->GetView();
@@ -175,38 +186,6 @@ void Game::Render()
 	m_d3dContext->OMSetDepthStencilState(m_states->DepthNone(), 0);
 	m_d3dContext->RSSetState(m_states->Wireframe());
 
-	// ビュー行列を生成
-	//m_view = Matrix::CreateLookAt(
-	//	Vector3(0, 0, 2.f),	// カメラ視点
-	//	Vector3(0,0,0),	// カメラ参照点
-	//	Vector3(0,1,0)	// 画面上方向ベクトル
-	//);
-	// デバッグカメラからビュー行列を取得
-	//m_view = m_debugCamera->GetCameraMatrix();
-
-	//// カメラの位置（視点座標）
-	//Vector3 eyepos(0, 0, 5);
-	//// カメラの見ている先(注視点/参照点)
-	//Vector3 refpos(0, 0, 0);
-	//// カメラの上方向ベクトル
-	//static float angle = 0.0f;
-	//angle += 0.1f;
-	//Vector3 upvec(cosf(angle), sinf(angle), 0);
-	//upvec.Normalize();
-	//// ビュー行列の生成
-	//m_view = Matrix::CreateLookAt(eyepos, refpos, upvec);
-	// プロジェクション行列を生成
-	//// 垂直方向視野角
-	//float fovY = XMConvertToRadians(60.0f);
-	//// アスペクト比（横縦の比率）
-	//float aspect = (float)m_outputWidth / m_outputHeight;
-	//// ニアクリップ（手前の表示限界距離）
-	//float nearclip = 0.1f;
-	//// ファークリップ（奥の表示限界距離）
-	//float farclip = 1000.0f;
-	//// 射影行列の生成
-	//m_proj = Matrix::CreatePerspectiveFieldOfView(fovY,	aspect,	nearclip,farclip);
-
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
 
@@ -223,22 +202,14 @@ void Game::Render()
 		m_proj
 	);
 
-	
+	m_Player->Draw();
 
-	//// パーツ1の描画
-	//m_modelHead->Draw(m_d3dContext.Get(),
-	//	*m_states,
-	//	head_world,
-	//	m_view,
-	//	m_proj
-	//);
-	//// パーツ2の描画
-	//m_modelHead->Draw(m_d3dContext.Get(),
-	//	*m_states,
-	//	head_world2,
-	//	m_view,
-	//	m_proj
-	//);
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
+		it != m_Enemies.end();
+		it++)
+	{
+		(*it)->Draw();
+	}
 
 	m_batch->Begin();
 
