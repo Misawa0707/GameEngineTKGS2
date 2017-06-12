@@ -123,7 +123,16 @@ void Player::Update()
 		m_Obj[0].SetTranslation(pos + moveV);
 	}
 
+	// 弾丸パーツの前進処理
+	{
+		// 弾丸パーツの座標を移動
+		Vector3 pos = m_Obj[PARTS_RWING].GetTranslation();
+		m_Obj[PARTS_RWING].SetTranslation(pos + m_BulletVel);
+	}
+
 	Calc();
+
+	FireBullet();
 }
 
 //-----------------------------------------------------------------------------
@@ -150,6 +159,36 @@ void Player::Draw()
 	{
 		it->Draw();
 	}
+}
+
+void Player::FireBullet()
+{
+	// 発射するパーツのワールド行列を取得
+	Matrix worldm = m_Obj[PARTS_RWING].GetWorld();
+
+	// 抽出した情報をしまっておく変数
+	Vector3 scale;			// ワールドスケーリング
+	Quaternion rotation;	// ワールド回転
+	Vector3 translation;	// ワールド座標
+
+	// ワールド行列から各要素を抽出
+	worldm.Decompose(scale, rotation, translation);
+
+	// 親パーツから分離、独立させる
+	m_Obj[PARTS_RWING].SetObjParent(nullptr);
+	m_Obj[PARTS_RWING].SetScale(scale);
+	m_Obj[PARTS_RWING].SetRotationQ(rotation);
+	m_Obj[PARTS_RWING].SetTranslation(translation);
+
+	// 弾丸パーツの速度を設定
+	m_BulletVel = Vector3(0, 0, -0.1f);
+	// パーツの向きに合わせて速度ベクトルを回転
+	m_BulletVel = Vector3::Transform(m_BulletVel, rotation);
+
+}
+
+void Player::ResetBullet()
+{
 }
 
 const DirectX::SimpleMath::Vector3& Player::GetTrans()
