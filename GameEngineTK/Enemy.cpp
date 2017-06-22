@@ -69,6 +69,13 @@ void Enemy::Initialize()
 
 	m_DistAngle = 0;
 
+	{// 弾丸用の当たり判定ノードの設定
+		m_CollisionNodeBody.Initialize();
+		// 親パーツを設定
+		m_CollisionNodeBody.SetParent(&m_Obj[0]);
+		m_CollisionNodeBody.SetTrans(Vector3(0,0.5f,0));
+		m_CollisionNodeBody.SetLocalRadius(0.8f);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -152,6 +159,8 @@ void Enemy::Calc()
 	{
 		it->Update();
 	}
+
+	m_CollisionNodeBody.Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -165,6 +174,8 @@ void Enemy::Draw()
 	{
 		it->Draw();
 	}
+
+	m_CollisionNodeBody.Draw();
 }
 
 const DirectX::SimpleMath::Vector3& Enemy::GetTrans()
