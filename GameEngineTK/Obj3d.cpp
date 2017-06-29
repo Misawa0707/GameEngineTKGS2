@@ -39,6 +39,28 @@ Obj3d::Obj3d()
 	m_UseQuaternion = false;
 }
 
+//Obj3d::Obj3d(Obj3d && obj)
+//{
+//	this->m_model = std::move(obj.m_model);
+//
+//	this->m_rotation = std::move(obj.m_rotation);
+//}
+
+//Obj3d::Obj3d(const Obj3d & obj)
+//{
+//	//obj.m_model.reset();
+//	//this->m_model = std::move(obj.m_model);
+//	//this->m_rotation = obj.m_rotation;
+//
+//	//m_model = std::move(obj.m_model);
+//	//this->m_model = std::move(obj.m_model);
+//	//std::unique_ptr<Model> model = std::move(obj.m_model);
+//}
+
+//Obj3d::~Obj3d()
+//{
+//}
+
 void Obj3d::LoadModel(const wchar_t * fileName)
 {
 	// ‚b‚l‚n‚©‚çƒ‚ƒfƒ‹‚ğ“Ç‚İ‚Ş

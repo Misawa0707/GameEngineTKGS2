@@ -28,3 +28,22 @@ bool CheckSphere2Sphere(const Sphere& sphereA, const Sphere& sphereB)
 	// 当たっている
 	return true;
 }
+
+/// <summary>
+/// 3点から三角形を構築
+/// </summary>
+/// <param name="_p0">点０</param>
+/// <param name="_p1">点１</param>
+/// <param name="_p2">点２</param>
+/// <param name="_triangle">三角形（結果出力用）</param>
+void ComputeTriangle(const Vector3& _p0, const Vector3& _p1, const Vector3& _p2, Triangle* _triangle)
+{
+	// 座標をコピー
+	_triangle->P0 = _p0;
+	_triangle->P1 = _p1;
+	_triangle->P2 = _p2;
+
+	// 法線ベクトルを計算
+	Vector3 P0_P1;
+
+}
