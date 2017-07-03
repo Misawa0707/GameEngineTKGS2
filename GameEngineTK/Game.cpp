@@ -47,6 +47,14 @@ void Game::Initialize(HWND window, int width, int height)
 	// ３Ｄオブジェクトの静的メンバ変数を初期化
 	Obj3d::InitializeStatic(m_d3dDevice, m_d3dContext, m_Camera.get());
 
+	// 土地当たりの設定
+	LandShapeCommonDef lscDef;
+	lscDef.pDevice = m_d3dDevice.Get();
+	lscDef.pDeviceContext = m_d3dContext.Get();
+	lscDef.pCamera = m_Camera.get();
+	// 土地当たりの共通初期化
+	LandShape::InitializeCommon(lscDef);
+
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
 
 
@@ -79,13 +87,14 @@ void Game::Initialize(HWND window, int width, int height)
 	m_factory->SetDirectory(L"Resources");
 	// モデルの生成
 	m_objSkydome.LoadModel(L"Resources/skydome.cmo");
-	
-	// モデルの生成
-	m_modelGround = Model::CreateFromCMO(
-		m_d3dDevice.Get(),
-		L"Resources/ground200m.cmo",
-		*m_factory
-	);
+	// 地形データの読み込み landshape   cmoファイル名
+	m_LandShape.Initialize(L"ball", L"ground200m");
+	//// モデルの生成
+	//m_modelGround = Model::CreateFromCMO(
+	//	m_d3dDevice.Get(),
+	//	L"Resources/ground200m.cmo",
+	//	*m_factory
+	//);
 	
 	// プレイヤーの生成
 	m_Player = std::make_unique<Player>(keyboard.get());
@@ -178,8 +187,11 @@ void Game::Update(DX::StepTimer const& timer)
 		m_proj = m_Camera->GetProj();
 	}
 
+
+
 	m_objSkydome.Update();
 
+	m_LandShape.Update();
 	
 }
 
@@ -222,13 +234,14 @@ void Game::Render()
 
 	// モデルの描画
 	m_objSkydome.Draw();
-	// モデルの描画
-	m_modelGround->Draw(m_d3dContext.Get(),
-		*m_states,
-		Matrix::Identity,
-		m_view,
-		m_proj
-	);
+	//// モデルの描画
+	//m_modelGround->Draw(m_d3dContext.Get(),
+	//	*m_states,
+	//	Matrix::Identity,
+	//	m_view,
+	//	m_proj
+	//);
+	m_LandShape.Draw();
 
 	m_Player->Draw();
 

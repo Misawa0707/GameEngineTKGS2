@@ -44,6 +44,10 @@ void ComputeTriangle(const Vector3& _p0, const Vector3& _p1, const Vector3& _p2,
 	_triangle->P2 = _p2;
 
 	// 法線ベクトルを計算
-	Vector3 P0_P1;
+	Vector3 P0_P1 = _p1 - _p0;
+	Vector3 P1_P2 = _p2 - _p1;
 
+	// 2ベクトルに垂直なベクトルを得る
+	_triangle->Normal = P0_P1.Cross(P1_P2);
+	_triangle->Normal.Normalize();
 }

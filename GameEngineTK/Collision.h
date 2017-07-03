@@ -45,3 +45,5 @@ public:
 };
 
 bool CheckSphere2Sphere(const Sphere & sphereA, const Sphere & sphereB);
+
+void ComputeTriangle(const DirectX::SimpleMath::Vector3 & _p0, const DirectX::SimpleMath::Vector3 & _p1, const DirectX::SimpleMath::Vector3 & _p2, Triangle * _triangle);
