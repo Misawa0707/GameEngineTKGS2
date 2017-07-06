@@ -63,6 +63,9 @@ public:
 	const DirectX::SimpleMath::Matrix& GetLocalWorld();
 	// 弾丸用の当たり判定を取得
 	const SphereNode& GetCollisionNodeBullet() { return m_CollisionNodeBullet; }
+	// 全身用の当たり判定を取得
+	const SphereNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
+
 protected:
 	// メンバ変数
 	// ロボットの構成パーツ
@@ -81,5 +84,7 @@ protected:
 	bool FireFlag;
 	// 弾丸用の当たり判定
 	SphereNode m_CollisionNodeBullet;
+	// 全身用の当たり判定
+	SphereNode m_CollisionNodeBody;
 };
 

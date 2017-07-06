@@ -69,7 +69,7 @@ void Enemy::Initialize()
 
 	m_DistAngle = 0;
 
-	{// 弾丸用の当たり判定ノードの設定
+	{// 全体用の当たり判定ノードの設定
 		m_CollisionNodeBody.Initialize();
 		// 親パーツを設定
 		m_CollisionNodeBody.SetParent(&m_Obj[0]);

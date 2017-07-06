@@ -192,6 +192,29 @@ void Game::Update(DX::StepTimer const& timer)
 	m_objSkydome.Update();
 
 	m_LandShape.Update();
+
+	// 自機の地形へのめりこみを解消する
+	{
+		Sphere sphere = m_Player->GetCollisionNodeBody();
+		// 自機のワールド座標
+		Vector3 trans = m_Player->GetTrans();
+		// 球からプレイヤーへのベクトル
+		Vector3 sphere2player = trans - sphere.Center;
+		// めりこみ排斥ベクトル
+		Vector3 reject; 
+
+		// 球と地形の当たり判定
+		if (m_LandShape.IntersectSphere(sphere, &reject))
+		{
+			// めりこみを解消するように球をずらす
+			sphere.Center += reject;
+		}
+
+		// 自機を移動
+		m_Player->SetTrans(sphere.Center + sphere2player);
+		// ワールド行列を更新
+		m_Player->Calc();
+	}
 	
 }
 
