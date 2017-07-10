@@ -88,7 +88,8 @@ void Game::Initialize(HWND window, int width, int height)
 	// モデルの生成
 	m_objSkydome.LoadModel(L"Resources/skydome.cmo");
 	// 地形データの読み込み landshape   cmoファイル名
-	m_LandShape.Initialize(L"ball", L"ground200m");
+	m_LandShape.Initialize(L"ground200m", L"ground200m");
+	m_LandShape.SetRot(Vector3(0.5f, 0, 0));
 	//// モデルの生成
 	//m_modelGround = Model::CreateFromCMO(
 	//	m_d3dDevice.Get(),
@@ -216,6 +217,39 @@ void Game::Update(DX::StepTimer const& timer)
 		m_Player->Calc();
 	}
 	
+	{// 自機が地面に乗る処理
+		const Vector3 vel = m_Player->GetVelocity();
+		if (vel.y <= 0.0f)
+		{
+			// 自機の頭から足元への線分
+			Segment player_segment;
+			// 自機のワールド座標
+			Vector3 trans = m_Player->GetTrans();
+			player_segment.Start = trans + Vector3(0, 1, 0);
+			// 足元50センチ下まで地面を検出
+			player_segment.End = trans + Vector3(0, -0.5f, 0);
+			// 交点座標
+			Vector3 inter;
+			// 地形と線分の当たり判定（レイキャスト	RayCasting）
+			if (m_LandShape.IntersectSegment(player_segment, &inter))
+			{
+				// Y座標を交点に移動させる
+				trans.y = inter.y;
+				// 落下を終了
+				m_Player->StopJump();
+			}
+			else
+			{
+				// 落下を開始
+				m_Player->StartFall();
+			}
+
+			// 自機を移動
+			m_Player->SetTrans(trans);
+			// ワールド行列を更新
+			m_Player->Calc();
+		}
+	}
 }
 
 // Draws the scene.
